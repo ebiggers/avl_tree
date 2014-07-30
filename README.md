@@ -10,6 +10,9 @@ commonly used in kernel data structures.  This is actually the more general
 style of implementation; a void pointer and comparison callback-based
 implementation can (but does not have to be) be built on top of it.
 
+This implementation is non-recursive, so it does not suffer from stack
+overflows.
+
 # Features
 
 Briefly, the supported operations are:
