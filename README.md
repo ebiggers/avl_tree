@@ -38,6 +38,6 @@ They are provided as-is, with no warranty whatsoever.
 
 # Projects using this code
 
-I use this code in wimlib (http://sourceforge.net/projects/wimlib/), a library
-for reading and writing Windows Imaging (WIM) archives.  It is used in critical
-code that indexes files in directories by name, so it has been well tested.
+I use this code in wimlib (https://wimlib.net), a library for reading and
+writing Windows Imaging (WIM) archives.  It is used in critical code that
+indexes files in directories by name, so it has been well tested.
