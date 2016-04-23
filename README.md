@@ -33,11 +33,6 @@ See avl_tree.h for details.
 
 # License
 
-This code and its accompanying files are released into the public domain.
-They are provided as-is, with no warranty whatsoever.
-
-# Projects using this code
-
-I use this code in wimlib (https://wimlib.net), a library for reading and
-writing Windows Imaging (WIM) archives.  It is used in critical code that
-indexes files in directories by name, so it has been well tested.
+This code and its accompanying files have been released into the public domain.
+There is NO WARRANTY, to the extent permitted by law.  See the CC0 Public Domain
+Dedication in the COPYING file for details.
