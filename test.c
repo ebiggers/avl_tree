@@ -8,7 +8,7 @@
  *
  * -----------------------------------------------------------------------------
  *
- * Written in 2014 by Eric Biggers <ebiggers3@gmail.com>
+ * Written in 2014-2016 by Eric Biggers <ebiggers3@gmail.com>
  *
  * To the extent possible under law, the author(s) have dedicated all copyright
  * and related and neighboring rights to this software to the public domain
@@ -169,6 +169,16 @@ verify(const int *data, int count)
 	}
 	assert(x == count);
 
+	/* Check reverse in-order traversal.  */
+	for (cur = avl_tree_last_in_order(root), x = count - 1;
+	     cur;
+	     cur = avl_tree_prev_in_order(cur), x--)
+	{
+		assert(INT_VALUE(cur) == data_sorted[x]);
+		TEST_NODE(cur)->reached = 0;
+	}
+	assert(x == -1);
+
 	/* Check postorder traversal.  */
 	for (cur = avl_tree_first_in_postorder(root), x = 0;
 	     cur;
@@ -229,7 +239,7 @@ test(int data[], int count)
 int
 main(void)
 {
-	const int num_iterations = 10000;
+	const int num_iterations = 100000;
 	const int max_node_count = 50;
 	int data[max_node_count];
 

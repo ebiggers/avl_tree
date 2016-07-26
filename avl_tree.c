@@ -2,7 +2,7 @@
  * avl_tree.c - intrusive, nonrecursive AVL tree data structure (self-balancing
  *		binary search tree), implementation file
  *
- * Written in 2014 by Eric Biggers <ebiggers3@gmail.com>
+ * Written in 2014-2016 by Eric Biggers <ebiggers3@gmail.com>
  *
  * To the extent possible under law, the author(s) have dedicated all copyright
  * and related and neighboring rights to this software to the public domain
@@ -19,37 +19,78 @@
 
 #include "avl_tree.h"
 
+/* Returns the left child (sign < 0) or the right child (sign > 0) of the
+ * specified AVL tree node.
+ * Note: for all calls of this, 'sign' is constant at compilation time,
+ * so the compiler can remove the conditional.  */
+static AVL_INLINE struct avl_tree_node *
+avl_get_child(const struct avl_tree_node *parent, int sign)
+{
+	if (sign < 0)
+		return parent->left;
+	else
+		return parent->right;
+}
+
+static AVL_INLINE struct avl_tree_node *
+avl_tree_first_or_last_in_order(const struct avl_tree_node *root, int sign)
+{
+	const struct avl_tree_node *first = root;
+
+	if (first)
+		while (avl_get_child(first, +sign))
+			first = avl_get_child(first, +sign);
+	return (struct avl_tree_node *)first;
+}
+
 /* Starts an in-order traversal of the tree: returns the least-valued node, or
  * NULL if the tree is empty.  */
 struct avl_tree_node *
 avl_tree_first_in_order(const struct avl_tree_node *root)
 {
-	const struct avl_tree_node *first = root;
+	return avl_tree_first_or_last_in_order(root, -1);
+}
 
-	if (first)
-		while (first->left)
-			first = first->left;
-	return (struct avl_tree_node *)first;
+/* Starts a *reverse* in-order traversal of the tree: returns the
+ * greatest-valued node, or NULL if the tree is empty.  */
+struct avl_tree_node *
+avl_tree_last_in_order(const struct avl_tree_node *root)
+{
+	return avl_tree_first_or_last_in_order(root, 1);
+}
+
+static AVL_INLINE struct avl_tree_node *
+avl_tree_next_or_prev_in_order(const struct avl_tree_node *node, int sign)
+{
+	const struct avl_tree_node *next;
+
+	if (avl_get_child(node, +sign))
+		for (next = avl_get_child(node, +sign);
+		     avl_get_child(next, -sign);
+		     next = avl_get_child(next, -sign))
+			;
+	else
+		for (next = avl_get_parent(node);
+		     next && node == avl_get_child(next, +sign);
+		     node = next, next = avl_get_parent(next))
+			;
+	return (struct avl_tree_node *)next;
 }
 
 /* Continues an in-order traversal of the tree: returns the next-greatest-valued
  * node, or NULL if there is none.  */
 struct avl_tree_node *
-avl_tree_next_in_order(const struct avl_tree_node *prev)
+avl_tree_next_in_order(const struct avl_tree_node *node)
 {
-	const struct avl_tree_node *next;
+	return avl_tree_next_or_prev_in_order(node, 1);
+}
 
-	if (prev->right)
-		for (next = prev->right;
-		     next->left;
-		     next = next->left)
-			;
-	else
-		for (next = avl_get_parent(prev);
-		     next && prev == next->right;
-		     prev = next, next = avl_get_parent(next))
-			;
-	return (struct avl_tree_node *)next;
+/* Continues a *reverse* in-order traversal of the tree: returns the
+ * previous-greatest-valued node, or NULL if there is none.  */
+struct avl_tree_node *
+avl_tree_prev_in_order(const struct avl_tree_node *node)
+{
+	return avl_tree_next_or_prev_in_order(node, -1);
 }
 
 /* Starts a postorder traversal of the tree.  */
@@ -81,19 +122,6 @@ avl_tree_next_in_postorder(const struct avl_tree_node *prev,
 		     next = next->left ? next->left : next->right)
 			;
 	return (struct avl_tree_node *)next;
-}
-
-/* Returns the left child (sign < 0) or the right child (sign > 0) of the
- * specified AVL tree node.
- * Note: for all calls of this, 'sign' is constant at compilation time,
- * so the compiler can remove the conditional.  */
-static AVL_INLINE struct avl_tree_node *
-avl_get_child(const struct avl_tree_node *parent, int sign)
-{
-	if (sign < 0)
-		return parent->left;
-	else
-		return parent->right;
 }
 
 /* Sets the left child (sign < 0) or the right child (sign > 0) of the

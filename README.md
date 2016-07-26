@@ -20,7 +20,7 @@ Briefly, the supported operations are:
 - Insertion
 - Deletion
 - Search
-- In-order traversal
+- In-order traversal (forwards and backwards)
 - Post-order traversal
 
 See avl_tree.h for details.

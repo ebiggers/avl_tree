@@ -2,7 +2,7 @@
  * avl_tree.h - intrusive, nonrecursive AVL tree data structure (self-balancing
  *		binary search tree), header file
  *
- * Written in 2014 by Eric Biggers <ebiggers3@gmail.com>
+ * Written in 2014-2016 by Eric Biggers <ebiggers3@gmail.com>
  *
  * To the extent possible under law, the author(s) have dedicated all copyright
  * and related and neighboring rights to this software to the public domain
@@ -269,7 +269,13 @@ extern struct avl_tree_node *
 avl_tree_first_in_order(const struct avl_tree_node *root);
 
 extern struct avl_tree_node *
-avl_tree_next_in_order(const struct avl_tree_node *prev);
+avl_tree_last_in_order(const struct avl_tree_node *root);
+
+extern struct avl_tree_node *
+avl_tree_next_in_order(const struct avl_tree_node *node);
+
+extern struct avl_tree_node *
+avl_tree_prev_in_order(const struct avl_tree_node *node);
 
 extern struct avl_tree_node *
 avl_tree_first_in_postorder(const struct avl_tree_node *root);
@@ -315,6 +321,18 @@ avl_tree_next_in_postorder(const struct avl_tree_node *prev,
 		      avl_tree_entry(_cur, struct_name,			\
 				     struct_member), 1);		\
 	     _cur = avl_tree_next_in_order(_cur))
+
+/*
+ * Like avl_tree_for_each_in_order(), but uses the reverse order.
+ */
+#define avl_tree_for_each_in_reverse_order(child_struct, root,		\
+					   struct_name, struct_member)	\
+	for (struct avl_tree_node *_cur =				\
+		avl_tree_last_in_order(root);				\
+	     _cur && ((child_struct) =					\
+		      avl_tree_entry(_cur, struct_name,			\
+				     struct_member), 1);		\
+	     _cur = avl_tree_prev_in_order(_cur))
 
 /*
  * Like avl_tree_for_each_in_order(), but iterates through the nodes in
