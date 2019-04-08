@@ -192,6 +192,20 @@ verify(const int *data, int count)
 		assert(!cur->right  || TEST_NODE(cur->right)->reached);
 	}
 	assert(x == count);
+
+	/* Check preorder traversal.  */
+	for (cur = avl_tree_first_in_preorder(root), x = 0;
+	     cur;
+	     cur = avl_tree_next_in_preorder(cur, avl_get_parent(cur)), x++)
+	{
+		assert(TEST_NODE(cur)->reached);
+		TEST_NODE(cur)->reached = 0;
+		assert(!avl_get_parent(cur) ||
+		       !(TEST_NODE(avl_get_parent(cur))->reached));
+		assert(!cur->left   || TEST_NODE(cur->left)->reached);
+		assert(!cur->right  || TEST_NODE(cur->right)->reached);
+	}
+	assert(x == count);
 }
 #endif
 
