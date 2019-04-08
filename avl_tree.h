@@ -286,6 +286,13 @@ extern struct avl_tree_node *
 avl_tree_prev_in_order(const struct avl_tree_node *node);
 
 extern struct avl_tree_node *
+avl_tree_first_in_preorder(const struct avl_tree_node *root);
+
+extern struct avl_tree_node *
+avl_tree_next_in_preorder(const struct avl_tree_node *prev,
+			   const struct avl_tree_node *prev_parent);
+
+extern struct avl_tree_node *
 avl_tree_first_in_postorder(const struct avl_tree_node *root);
 
 extern struct avl_tree_node *
@@ -342,18 +349,33 @@ avl_tree_next_in_postorder(const struct avl_tree_node *prev,
 				     struct_member), 1);		\
 	     _cur = avl_tree_prev_in_order(_cur))
 
+
+#define avl_tree_for_each(child_struct, root,       \
+                       struct_name, struct_member, order)  \
+	for (struct avl_tree_node *_cur =				\
+		avl_tree_first_in_##order(root), *_parent;		\
+	     _cur && ((child_struct) =					\
+		      avl_tree_entry(_cur, struct_name,			\
+				     struct_member), 1)			\
+	          && (_parent = avl_get_parent(_cur), 1);		\
+	     _cur = avl_tree_next_in_##order(_cur, _parent))
+
+/*
+ * Like avl_tree_for_each_in_order(), but iterates through the nodes in
+ * preorder.
+ */
+#define avl_tree_for_each_in_preorder(child_struct, root,		\
+				       struct_name, struct_member)	\
+    avl_tree_for_each(child_struct, root,       \
+                       struct_name, struct_member, preorder)
+
 /*
  * Like avl_tree_for_each_in_order(), but iterates through the nodes in
  * postorder, so the current node may be deleted or freed.
  */
 #define avl_tree_for_each_in_postorder(child_struct, root,		\
-				       struct_name, struct_member)	\
-	for (struct avl_tree_node *_cur =				\
-		avl_tree_first_in_postorder(root), *_parent;		\
-	     _cur && ((child_struct) =					\
-		      avl_tree_entry(_cur, struct_name,			\
-				     struct_member), 1)			\
-	          && (_parent = avl_get_parent(_cur), 1);		\
-	     _cur = avl_tree_next_in_postorder(_cur, _parent))
+                       struct_name, struct_member)	\
+    avl_tree_for_each(child_struct, root,       \
+                       struct_name, struct_member, postorder)
 
 #endif /* _AVL_TREE_H_ */
