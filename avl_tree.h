@@ -362,20 +362,20 @@ avl_tree_next_in_postorder(const struct avl_tree_node *prev,
 
 /*
  * Like avl_tree_for_each_in_order(), but iterates through the nodes in
- * postorder, so the current node may be deleted or freed.
- */
-#define avl_tree_for_each_in_postorder(child_struct, root,		\
-                       struct_name, struct_member)	\
-    avl_tree_for_each(child_struct, root,       \
-                       struct_name, struct_member, postorder)
-
-/*
- * Like avl_tree_for_each_in_order(), but iterates through the nodes in
  * preorder.
  */
 #define avl_tree_for_each_in_preorder(child_struct, root,		\
 				       struct_name, struct_member)	\
     avl_tree_for_each(child_struct, root,       \
                        struct_name, struct_member, preorder)
+
+/*
+ * Like avl_tree_for_each_in_order(), but iterates through the nodes in
+ * postorder, so the current node may be deleted or freed.
+ */
+#define avl_tree_for_each_in_postorder(child_struct, root,		\
+                       struct_name, struct_member)	\
+    avl_tree_for_each(child_struct, root,       \
+                       struct_name, struct_member, postorder)
 
 #endif /* _AVL_TREE_H_ */

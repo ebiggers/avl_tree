@@ -93,6 +93,37 @@ avl_tree_prev_in_order(const struct avl_tree_node *node)
 	return avl_tree_next_or_prev_in_order(node, -1);
 }
 
+/* Starts a preorder traversal of the tree.  */
+struct avl_tree_node *
+avl_tree_first_in_preorder(const struct avl_tree_node *root)
+{
+	return (struct avl_tree_node *)root;
+}
+
+/* Continues a preorder traversal of the tree. @prev_parent must be its saved
+ * parent node.  Returns NULL if there are no more nodes (i.e. @prev was the
+ * root of the tree).  */
+struct avl_tree_node *
+avl_tree_next_in_preorder(const struct avl_tree_node *prev,
+			   const struct avl_tree_node *prev_parent)
+{
+    const struct avl_tree_node *next = NULL;
+
+    if (prev && (prev->left || prev->right))
+        next = prev->left ? prev->left : prev->right;
+    else
+        for (;
+            prev_parent;
+            prev = prev_parent, prev_parent = avl_get_parent(prev_parent))
+            if (prev_parent->right && prev_parent->right != prev)
+            {
+                next = prev_parent->right;
+                break;
+            }
+
+    return (struct avl_tree_node *)next;
+}
+
 /* Starts a postorder traversal of the tree.  */
 struct avl_tree_node *
 avl_tree_first_in_postorder(const struct avl_tree_node *root)
@@ -787,35 +818,3 @@ avl_tree_remove(struct avl_tree_node **root_ptr, struct avl_tree_node *node)
 							   -1, &left_deleted);
 	} while (parent);
 }
-
-/* Starts a preorder traversal of the tree.  */
-struct avl_tree_node *
-avl_tree_first_in_preorder(const struct avl_tree_node *root)
-{
-	return (struct avl_tree_node *)root;
-}
-
-/* Continues a preorder traversal of the tree. @prev_parent must be its saved
- * parent node.  Returns NULL if there are no more nodes (i.e. @prev was the
- * root of the tree).  */
-struct avl_tree_node *
-avl_tree_next_in_preorder(const struct avl_tree_node *prev,
-			   const struct avl_tree_node *prev_parent)
-{
-    const struct avl_tree_node *next = NULL;
-
-    if (prev && (prev->left || prev->right))
-        next = prev->left ? prev->left : prev->right;
-    else
-        for (;
-            prev_parent;
-            prev = prev_parent, prev_parent = avl_get_parent(prev_parent))
-            if (prev_parent->right && prev_parent->right != prev)
-            {
-                next = prev_parent->right;
-                break;
-            }
-
-    return (struct avl_tree_node *)next;
-}
-
